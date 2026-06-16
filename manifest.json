@@ -1,7 +1,7 @@
 {
   "id": "obsidian-fix-callout-edit-mode",
   "name": "Fix Callout Edit Mode",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "minAppVersion": "1.6.0",
   "description": "Keep callout body clicks in Live Preview from entering edit mode unless you use Obsidian's callout edit control.",
   "main": "main.js",
