@@ -1,6 +1,6 @@
 {
   "name": "obsidian-fix-callout-edit-mode",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Prevents unintended callout body edit-mode activation in Obsidian Live Preview.",
   "author": "padasch",
   "license": "MIT",
