@@ -21,7 +21,6 @@ const INTERACTIVE_ANCESTOR_SELECTORS = [
 	"summary",
 	"[role='button']",
 	"[role='checkbox']",
-	"[contenteditable='true']",
 	".task-list-item-checkbox",
 	".checkbox-container",
 ];
