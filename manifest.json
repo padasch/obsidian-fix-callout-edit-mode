@@ -5,6 +5,6 @@
   "minAppVersion": "1.6.0",
   "description": "Keep callout body clicks in Live Preview from entering edit mode unless you use Obsidian's callout edit control.",
   "main": "main.js",
-  "author": "Community Plugin Template",
+  "author": "padasch",
   "isDesktopOnly": false
 }
