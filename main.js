@@ -40,6 +40,14 @@ var INTERACTIVE_ANCESTOR_SELECTORS = [
   ".task-list-item-checkbox",
   ".checkbox-container"
 ];
+var CALL_OUT_HEADER_SELECTORS = [
+  ".callout-title",
+  ".callout-title-inner",
+  ".callout-icon",
+  "[data-callout-icon]",
+  "[data-icon='caret-right']",
+  "[data-icon='chevron-right']"
+];
 var CALL_OUT_EDIT_BUTTON_SELECTORS = [
   ".edit-block-button",
   "button[data-action='edit-block']",
@@ -76,6 +84,9 @@ var FixCalloutEditModePlugin = class extends import_obsidian.Plugin {
     if (!event.target.closest(".callout")) {
       return;
     }
+    if (this.isCalloutHeaderLine(event.target)) {
+      return;
+    }
     if (this.isInsideInteractiveElement(event.target)) {
       return;
     }
@@ -86,6 +97,9 @@ var FixCalloutEditModePlugin = class extends import_obsidian.Plugin {
   };
   isInsideInteractiveElement(target) {
     return INTERACTIVE_ANCESTOR_SELECTORS.some((selector) => target.closest(selector) !== null);
+  }
+  isCalloutHeaderLine(target) {
+    return CALL_OUT_HEADER_SELECTORS.some((selector) => target.closest(selector) !== null);
   }
   isCalloutEditButton(target) {
     if (CALL_OUT_EDIT_BUTTON_SELECTORS.some((selector) => target.closest(selector) !== null)) {

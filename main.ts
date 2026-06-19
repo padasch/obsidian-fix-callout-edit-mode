@@ -25,6 +25,17 @@ const INTERACTIVE_ANCESTOR_SELECTORS = [
 	".checkbox-container",
 ];
 
+// Obsidian renders callout title areas with these hooks. Treating the whole header
+// as interactive preserves folding/unfolding when clicking anywhere on the title row.
+const CALL_OUT_HEADER_SELECTORS = [
+	".callout-title",
+	".callout-title-inner",
+	".callout-icon",
+	"[data-callout-icon]",
+	"[data-icon='caret-right']",
+	"[data-icon='chevron-right']",
+];
+
 // These are the most stable selectors currently seen for the callout edit control.
 // Keep this list in one place to make future Obsidian DOM updates easy to handle.
 const CALL_OUT_EDIT_BUTTON_SELECTORS = [
@@ -82,6 +93,12 @@ export default class FixCalloutEditModePlugin extends Plugin {
 			return;
 		}
 
+		// Allow normal callout header interactions (fold/unfold), including clicks on
+		// any part of the title row, not just the tiny arrow target.
+		if (this.isCalloutHeaderLine(event.target)) {
+			return;
+		}
+
 		// Ignore normal interactive areas inside the callout.
 		// This keeps links, form controls, checkboxes, buttons, and other controls working.
 		if (this.isInsideInteractiveElement(event.target)) {
@@ -100,6 +117,10 @@ export default class FixCalloutEditModePlugin extends Plugin {
 
 	private isInsideInteractiveElement(target: HTMLElement): boolean {
 		return INTERACTIVE_ANCESTOR_SELECTORS.some((selector) => target.closest(selector) !== null);
+	}
+
+	private isCalloutHeaderLine(target: HTMLElement): boolean {
+		return CALL_OUT_HEADER_SELECTORS.some((selector) => target.closest(selector) !== null);
 	}
 
 	private isCalloutEditButton(target: HTMLElement): boolean {
