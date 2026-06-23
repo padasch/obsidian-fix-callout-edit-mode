@@ -48,6 +48,33 @@ var CALL_OUT_HEADER_SELECTORS = [
   "[data-icon='caret-right']",
   "[data-icon='chevron-right']"
 ];
+var TASKS_EMOJI_ACTION_SELECTORS = [
+  ".task-list-item",
+  ".task-list-item-checkbox",
+  "[data-task-id]",
+  "[data-task-action]",
+  "[data-action^='task']",
+  "[data-action^='tasks']",
+  ".tasks-edit",
+  ".tasks-postpone",
+  ".task-due",
+  ".task-scheduled",
+  ".task-start",
+  ".task-created",
+  ".task-done",
+  ".task-cancelled",
+  ".task-priority",
+  ".task-recurring",
+  ".task-id",
+  ".task-block",
+  "[class*='tasks-']",
+  "[class*='task-']",
+  "[role='button'][aria-label*='due']",
+  "[role='button'][aria-label*='schedule']",
+  "[role='button'][title*='due']",
+  "[role='button'][title*='schedule']",
+  "button[data-action][aria-label*='task']"
+];
 var CALL_OUT_EDIT_BUTTON_SELECTORS = [
   ".edit-block-button",
   "button[data-action='edit-block']",
@@ -90,6 +117,9 @@ var FixCalloutEditModePlugin = class extends import_obsidian.Plugin {
     if (this.isInsideInteractiveElement(event.target)) {
       return;
     }
+    if (this.isTasksEmojiAction(event.target)) {
+      return;
+    }
     if (this.isCalloutEditButton(event.target)) {
       return;
     }
@@ -100,6 +130,27 @@ var FixCalloutEditModePlugin = class extends import_obsidian.Plugin {
   }
   isCalloutHeaderLine(target) {
     return CALL_OUT_HEADER_SELECTORS.some((selector) => target.closest(selector) !== null);
+  }
+  isTasksEmojiAction(target) {
+    const taskActionContext = target.closest(
+      ".tasks-edit, .tasks-postpone, .task-list-item, .task-list-item-checkbox, [data-task-id], [data-task-action], [data-action^='task'], [data-action^='tasks']"
+    );
+    if (taskActionContext) {
+      return true;
+    }
+    if (TASKS_EMOJI_ACTION_SELECTORS.some((selector) => target.closest(selector) !== null)) {
+      return true;
+    }
+    const actionLike = target.closest("button, [role='button'], [tabindex], a");
+    if (!actionLike) {
+      return false;
+    }
+    const actionContainer = actionLike.closest("[data-task-id], [data-task-action], [data-action^='task'], [data-action^='tasks'], [class*='tasks-'], [class*='task-']");
+    if (!actionContainer) {
+      return false;
+    }
+    const hint = `${actionLike.getAttribute("aria-label") ?? ""} ${actionLike.getAttribute("title") ?? ""} ${actionLike.textContent ?? ""}`.toLowerCase();
+    return /task|calendar|due|schedule|recurr|memo|repeat|postpone|start date|due date|done|priority|cancel/.test(hint);
   }
   isCalloutEditButton(target) {
     if (CALL_OUT_EDIT_BUTTON_SELECTORS.some((selector) => target.closest(selector) !== null)) {

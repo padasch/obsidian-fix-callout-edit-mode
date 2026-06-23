@@ -36,6 +36,36 @@ const CALL_OUT_HEADER_SELECTORS = [
 	"[data-icon='chevron-right']",
 ];
 
+// Tasks plugin action controls in Live Preview are rendered as icon-only controls.
+// They may not always be <button> elements, so this list keeps those controls interactive.
+const TASKS_EMOJI_ACTION_SELECTORS = [
+	".task-list-item",
+	".task-list-item-checkbox",
+	"[data-task-id]",
+	"[data-task-action]",
+	"[data-action^='task']",
+	"[data-action^='tasks']",
+	".tasks-edit",
+	".tasks-postpone",
+	".task-due",
+	".task-scheduled",
+	".task-start",
+	".task-created",
+	".task-done",
+	".task-cancelled",
+	".task-priority",
+	".task-recurring",
+	".task-id",
+	".task-block",
+	"[class*='tasks-']",
+	"[class*='task-']",
+	"[role='button'][aria-label*='due']",
+	"[role='button'][aria-label*='schedule']",
+	"[role='button'][title*='due']",
+	"[role='button'][title*='schedule']",
+	"button[data-action][aria-label*='task']",
+];
+
 // These are the most stable selectors currently seen for the callout edit control.
 // Keep this list in one place to make future Obsidian DOM updates easy to handle.
 const CALL_OUT_EDIT_BUTTON_SELECTORS = [
@@ -105,6 +135,10 @@ export default class FixCalloutEditModePlugin extends Plugin {
 			return;
 		}
 
+		if (this.isTasksEmojiAction(event.target)) {
+			return;
+		}
+
 		// Explicitly allow the callout edit button so users can still open source/edit mode
 		// in the way Obsidian intends.
 		if (this.isCalloutEditButton(event.target)) {
@@ -121,6 +155,35 @@ export default class FixCalloutEditModePlugin extends Plugin {
 
 	private isCalloutHeaderLine(target: HTMLElement): boolean {
 		return CALL_OUT_HEADER_SELECTORS.some((selector) => target.closest(selector) !== null);
+	}
+
+	private isTasksEmojiAction(target: HTMLElement): boolean {
+		// Tasks plugin action controls in Live Preview are often emoji-based and may be
+		// non-standard elements (especially on mobile), so identify their nearest task
+		// context and let those events through.
+		const taskActionContext = target.closest(
+			".tasks-edit, .tasks-postpone, .task-list-item, .task-list-item-checkbox, [data-task-id], [data-task-action], [data-action^='task'], [data-action^='tasks']"
+		);
+		if (taskActionContext) {
+			return true;
+		}
+
+		if (TASKS_EMOJI_ACTION_SELECTORS.some((selector) => target.closest(selector) !== null)) {
+			return true;
+		}
+
+		const actionLike = target.closest("button, [role='button'], [tabindex], a");
+		if (!actionLike) {
+			return false;
+		}
+
+		const actionContainer = actionLike.closest("[data-task-id], [data-task-action], [data-action^='task'], [data-action^='tasks'], [class*='tasks-'], [class*='task-']");
+		if (!actionContainer) {
+			return false;
+		}
+
+		const hint = `${actionLike.getAttribute("aria-label") ?? ""} ${actionLike.getAttribute("title") ?? ""} ${actionLike.textContent ?? ""}`.toLowerCase();
+		return /task|calendar|due|schedule|recurr|memo|repeat|postpone|start date|due date|done|priority|cancel/.test(hint);
 	}
 
 	private isCalloutEditButton(target: HTMLElement): boolean {
