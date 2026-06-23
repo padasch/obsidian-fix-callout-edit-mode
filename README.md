@@ -26,6 +26,16 @@ links, checkboxes, inputs, and fold buttons.
    - `npm run build`
 3. In Obsidian, open **Settings → Community plugins** and enable **Fix Callout Edit Mode**.
 
+### BRAT testing
+
+BRAT expects these files as separate release assets:
+
+- `manifest.json`
+- `main.js`
+- (optional) `styles.css`
+
+If you attach only a zip file to the release, BRAT won’t detect the plugin.
+
 ## Behavior
 
 - Only applies in Live Preview / CM6 source view (`.markdown-source-view.mod-cm6`).
